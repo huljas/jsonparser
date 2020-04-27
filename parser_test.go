@@ -813,6 +813,13 @@ var getTests = []GetTest{
 		data:    "foo",
 	},
 	{
+		desc:    "get string from string array",
+		json:    `{"d": {"a":["foo"],"c":{"c":[1,2]}}}`,
+		path:    []string{"d", "a", "[0]"},
+		isFound: true,
+		data:    "foo",
+	},
+	{
 		desc:    "key in path is index",
 		json:    `{"a":[{"b":"1"},{"b":"2"},3],"c":{"c":[1,2]}}`,
 		path:    []string{"a", "[0]", "b"},
@@ -1579,7 +1586,7 @@ func TestObjectEach(t *testing.T) {
 	}
 }
 
-var testJson = []byte(`{"name": "Name", "order": "Order", "sum": 100, "len": 12, "isPaid": true, "nested": {"a":"test", "b":2, "nested3":{"a":"test3","b":4}, "c": "unknown"}, "nested2": {"a":"test2", "b":3}, "arr": [{"a":"zxc", "b": 1}, {"a":"123", "b":2}], "arrInt": [1,2,3,4], "intPtr": 10}`)
+var testJson = []byte(`{"name": "Name", "order": "Order", "sum": 100, "len": 12, "isPaid": true, "nested": {"a":"test", "b":2, "nested3":{"a":"test3","b":4}, "c": "unknown"}, "nested2": {"a":"test2", "b":3}, "arr": [{"a":"zxc", "b": 1}, {"a":"123", "b":2}], "arrInt": [1,2,3,4], "intPtr": 10, "arrStr": ["foo","bar"]}`)
 
 func TestEachKey(t *testing.T) {
 	paths := [][]string{
@@ -1594,6 +1601,7 @@ func TestEachKey(t *testing.T) {
 		{"arrInt", "[5]"}, // Should not find last key
 		{"nested"},
 		{"arr", "["}, // issue#177 Invalid arguments
+		{"arrStr", "[0]"},
 	}
 
 	keysFound := 0
@@ -1642,13 +1650,17 @@ func TestEachKey(t *testing.T) {
 			}
 		case 10:
 			t.Errorf("Found key #10 that should not be found")
+		case 11:
+			if string(value) != "foo" {
+				t.Error("Should find plain string array value", string(value), err)
+			}
 		default:
 			t.Errorf("Should find only 9 keys, got %v key", idx)
 		}
 	}, paths...)
 
-	if keysFound != 9 {
-		t.Errorf("Should find 9 keys: %d", keysFound)
+	if keysFound != 10 {
+		t.Errorf("Should find 10 keys: %d", keysFound)
 	}
 }
 

@@ -436,7 +436,7 @@ func EachKey(data []byte, cb func(int, []byte, ValueType, error), paths ...[]str
 
 					pathsBuf[level-1] = bytesToString(&keyUnesc)
 					for pi, p := range paths {
-						if len(p) != level || pathFlags&bitwiseFlags[pi+1] != 0 || !equalStr(&keyUnesc, p[level-1]) || !sameTree(p, pathsBuf[:level]) {
+						if len(p) != level || pathFlags & bitwiseFlags[pi+1] != 0 || !equalStr(&keyUnesc, p[level-1]) || !sameTree(p, pathsBuf[:level]) {
 							continue
 						}
 
@@ -518,8 +518,12 @@ func EachKey(data []byte, cb func(int, []byte, ValueType, error), paths ...[]str
 									pathFlags |= bitwiseFlags[pi+1]
 
 									if of != -1 {
-										v, dt, _, e := Get(value[of:])
-										cb(pi, v, dt, e)
+										if dataType == String || dataType == Number || dataType == Boolean {
+											cb(pi, value, dataType, err)
+										} else {
+											v, dt, _, e := Get(value[of:])
+											cb(pi, v, dt, e)
+										}
 									}
 								}
 							}
