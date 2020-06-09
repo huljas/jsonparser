@@ -356,7 +356,7 @@ func searchKeys(data []byte, keys ...string) int {
 var bitwiseFlags []int64
 
 func init() {
-	for i := 0; i < 63; i++ {
+	for i := 0; i < 127; i++ {
 		bitwiseFlags = append(bitwiseFlags, int64(math.Pow(2, float64(i))))
 	}
 }
